@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/andresmith/MuseDrone/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/classes-c33bfe4bbe7b75656890d5678ae022e89a7ad3fa.jar" />
+    </item>
+    <item
+        jar="/Users/andresmith/MuseDrone/app/libs/libmuseandroid.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="1b7a1ebe2d998c58d6ce2157fa29ef6df6fbdd38">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libmuseandroid-855e676c57fbcb12d2e664fcecb3fe4f22397f6c.jar" />
+    </item>
+    <item
+        jar="/Users/andresmith/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-ac0adce7c2c688d47f13364e605cd415b010ba63.jar" />
+    </item>
+    <item
+        jar="/Users/andresmith/MuseDrone/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/jars/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-71fe385aac6e438f117041cdcb894effa08794b0.jar" />
+    </item>
+
+</items>
