@@ -2,32 +2,46 @@
 <items version="2" >
 
     <item
-        jar="/Users/andresmith/MuseDrone/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/jars/classes.jar"
+        jar="/Users/andresmith/MuseDrone/app/libs/libARSAL.jar"
         jumboMode="false"
         revision="23.0.0"
-        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
-        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/classes-c33bfe4bbe7b75656890d5678ae022e89a7ad3fa.jar" />
+        sha1="a334dc353011de57a61694f78c2d6e4ee116e13a">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libARSAL-de5b8f740eef7bbf097a73f9cff07691c9e265bc.jar" />
     </item>
     <item
-        jar="/Users/andresmith/MuseDrone/app/libs/libmuseandroid.jar"
+        jar="/Users/andresmith/MuseDrone/app/libs/libARNetwork.jar"
         jumboMode="false"
         revision="23.0.0"
-        sha1="1b7a1ebe2d998c58d6ce2157fa29ef6df6fbdd38">
-        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libmuseandroid-855e676c57fbcb12d2e664fcecb3fe4f22397f6c.jar" />
+        sha1="db7f0347973cfb50cb37c04dc4361b38030d431c">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libARNetwork-901682aed96d80066bf558af7aab6cb98848aeb1.jar" />
     </item>
     <item
-        jar="/Users/andresmith/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jar="/Users/andresmith/MuseDrone/app/libs/libARCommands.jar"
         jumboMode="false"
         revision="23.0.0"
-        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
-        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-ac0adce7c2c688d47f13364e605cd415b010ba63.jar" />
+        sha1="88fc2115cc047c7422db77dcfbb340c63fe81d0e">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libARCommands-ae402b0eec4512aec2edddb9990f93d08d3db0e2.jar" />
     </item>
     <item
-        jar="/Users/andresmith/MuseDrone/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/jars/libs/internal_impl-21.0.3.jar"
+        jar="/Users/andresmith/MuseDrone/app/libs/libARDiscovery.jar"
         jumboMode="false"
         revision="23.0.0"
-        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-71fe385aac6e438f117041cdcb894effa08794b0.jar" />
+        sha1="d172ef6d7058d3f18a6b2636d95d5669d1a98c8e">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libARDiscovery-457e284f93d20d7306bc66dbd1d3c9d15beb9d8a.jar" />
+    </item>
+    <item
+        jar="/Users/andresmith/MuseDrone/app/libs/jmdns.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="3d7bfb1504607d2c33e6e635175e8a12dc57965a">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/jmdns-bb608ffda087170c76de1077a8d18d88087a3dc3.jar" />
+    </item>
+    <item
+        jar="/Users/andresmith/MuseDrone/app/libs/libARNetworkAL.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="58f996aea06caf69a63162e8fcb61131fc75c9c2">
+        <dex dex="/Users/andresmith/MuseDrone/app/build/intermediates/pre-dexed/debug/libARNetworkAL-eb35cc152ed12b24aa80cfc552cd73fd6c901516.jar" />
     </item>
 
 </items>

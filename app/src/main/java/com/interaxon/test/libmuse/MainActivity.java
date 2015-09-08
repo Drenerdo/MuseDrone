@@ -8,6 +8,7 @@ package com.interaxon.test.libmuse;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,7 @@ import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
  * Version information and MuseElements (alpha, beta, theta, delta, gamma waves)
  * on the screen.
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements DeviceControllerListener {
     public DeviceController deviceController;
     public ARDiscoveryDeviceService service;
 
@@ -90,7 +91,7 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    private void onUpdateBattery(final byte percent)
+    public void onUpdateBattery(final byte percent)
     {
         runOnUiThread(new Runnable() {
             @Override
@@ -206,28 +207,6 @@ public class MainActivity extends Activity implements OnClickListener {
             // TextView values. You don't have to use another thread, unless
             // you want to run disconnect() or connect() from connection packet
             // handler. In this case creating another thread is required.
-            if (activity != null) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView statusText =
-                                (TextView) findViewById(R.id.con_status);
-                        statusText.setText(status);
-                        TextView museVersionText =
-                                (TextView) findViewById(R.id.version);
-                        if (current == ConnectionState.CONNECTED) {
-                            MuseVersion museVersion = muse.getMuseVersion();
-                            String version = museVersion.getFirmwareType() +
-                                 " - " + museVersion.getFirmwareVersion() +
-                                 " - " + Integer.toString(
-                                    museVersion.getProtocolVersion());
-                            museVersionText.setText(version);
-                        } else {
-                            museVersionText.setText(R.string.undefined);
-                        }
-                    }
-                });
-            }
         }
     }
 
@@ -243,7 +222,6 @@ public class MainActivity extends Activity implements OnClickListener {
     class DataListener extends MuseDataListener {
 
         final WeakReference<Activity> activityRef;
-        private MuseFileWriter fileWriter;
 
         DataListener(final WeakReference<Activity> activityRef) {
             this.activityRef = activityRef;
@@ -251,22 +229,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
         @Override
         public void receiveMuseDataPacket(MuseDataPacket p) {
-            switch (p.getPacketType()) {
+            switch(p.getPacketType()){
                 case EEG:
                     updateEeg(p.getValues());
                     break;
                 case ACCELEROMETER:
                     updateAccelerometer(p.getValues());
-                    break;
-                case ALPHA_RELATIVE:
-                    updateAlphaRelative(p.getValues());
-                    break;
-                case BATTERY:
-                    fileWriter.addDataPacket(1, p);
-                    // It's library client responsibility to flush the buffer,
-                    // otherwise you may get memory overflow. 
-                    if (fileWriter.getBufferedMessagesSize() > 8096)
-                        fileWriter.flush();
                     break;
                 default:
                     break;
@@ -278,27 +246,64 @@ public class MainActivity extends Activity implements OnClickListener {
             if (p.getHeadbandOn() && p.getBlink()) {
                 Log.i("Artifacts", "blink");
             }
+
+            if(p.getBlink()) {
+                if(running) {
+                    textViewStatus.setText("blink:down");
+                }
+            } else if(p.getJawClench()){
+                if(running) {
+                    textViewStatus.setText("clench:up");
+                }
+            }
         }
 
         private void updateAccelerometer(final ArrayList<Double> data) {
             Activity activity = activityRef.get();
-            if (activity != null) {
-                activity.runOnUiThread(new Runnable() {
+            if(activity != null) {
+                activity.runOnUiThread(new Runnable(){
                     @Override
                     public void run() {
                         TextView acc_x = (TextView) findViewById(R.id.acc_x);
                         TextView acc_y = (TextView) findViewById(R.id.acc_y);
                         TextView acc_z = (TextView) findViewById(R.id.acc_z);
+
+                        Double x = data.get(Accelerometer.FORWARD_BACKWARD.ordinal());
+                        Double y = data.get(Accelerometer.UP_DOWN.ordinal());
+                        Double z = data.get(Accelerometer.LEFT_RIGHT.ordinal());
+
+                        if (x < -500) {
+                            back();
+                        } else if (x > 500) {
+                            forward();
+                        }
+
+                        if(z > 600) {
+                            right();
+                        } else if(z < -250) {
+                            left();
+                        }
+
                         acc_x.setText(String.format(
-                            "%6.2f", data.get(Accelerometer.FORWARD_BACKWARD.ordinal())));
+                            "%6.2f", x));
                         acc_y.setText(String.format(
-                            "%6.2f", data.get(Accelerometer.UP_DOWN.ordinal())));
+                            "%6.2f", y));
                         acc_z.setText(String.format(
-                            "%6.2f", data.get(Accelerometer.LEFT_RIGHT.ordinal())));
+                            "6.2f", z));
                     }
                 });
             }
         }
+
+        private int avg(double[] x) {
+            double sum = 0;
+            for(double xx : x){
+                sum+=xx;
+            }
+            return(int)sum/x.length;
+        }
+        private double[][] _eeg = new double[4][4];
+        private boolean hitLow = false;
 
         private void updateEeg(final ArrayList<Double> data) {
             Activity activity = activityRef.get();
@@ -310,44 +315,38 @@ public class MainActivity extends Activity implements OnClickListener {
                          TextView fp1 = (TextView) findViewById(R.id.eeg_fp1);
                          TextView fp2 = (TextView) findViewById(R.id.eeg_fp2);
                          TextView tp10 = (TextView) findViewById(R.id.eeg_tp10);
-                         tp9.setText(String.format(
-                            "%6.2f", data.get(Eeg.TP9.ordinal())));
-                         fp1.setText(String.format(
-                            "%6.2f", data.get(Eeg.FP1.ordinal())));
-                         fp2.setText(String.format(
-                            "%6.2f", data.get(Eeg.FP2.ordinal())));
-                         tp10.setText(String.format(
-                            "%6.2f", data.get(Eeg.TP10.ordinal())));
+
+                         _eeg[0] = _eeg[1];
+                         _eeg[1] = _eeg[2];
+                         _eeg[2] = _eeg[3];
+                         _eeg[3] = new double[] {
+                            data.get(Eeg.TP9.ordinal()),
+                            data.get(Eeg.FP1.ordinal()),
+                            data.get(Eeg.FP2.ordinal()),
+                            data.get(Eeg.TP10.ordinal())
+                        };
+
+                        int avg = avg(new double[] { avg(_eeg[0]), avg(_eeg[1]), avg(_eeg[2]), avg(_eeg[3]) });
+
+                        if(avg < 400) {
+                            hitLow = false;
+                        }
+
+                        if(avg > 1000 && hitLow){
+                            hitLow = false;
+                        }
+
+                        tp9.setText(String.format(
+                                "%6.2f", _eeg[3][0]));
+                        fp1.setText(String.format(
+                                "%6.2f", _eeg[3][1]));
+                        fp2.setText(String.format(
+                                "%6.2f", _eeg[3][2]));
+                        tp10.setText(String.format(
+                                "%6.2f", _eeg[3][3]));
                     }
                 });
             }
-        }
-
-        // private void updateAlphaRelative(final ArrayList<Double> data) {
-        //     Activity activity = activityRef.get();
-        //     if (activity != null) {
-        //         activity.runOnUiThread(new Runnable() {
-        //             @Override
-        //             public void run() {
-        //                  TextView elem1 = (TextView) findViewById(R.id.elem1);
-        //                  TextView elem2 = (TextView) findViewById(R.id.elem2);
-        //                  TextView elem3 = (TextView) findViewById(R.id.elem3);
-        //                  TextView elem4 = (TextView) findViewById(R.id.elem4);
-        //                  elem1.setText(String.format(
-        //                     "%6.2f", data.get(Eeg.TP9.ordinal())));
-        //                  elem2.setText(String.format(
-        //                     "%6.2f", data.get(Eeg.FP1.ordinal())));
-        //                  elem3.setText(String.format(
-        //                     "%6.2f", data.get(Eeg.FP2.ordinal())));
-        //                  elem4.setText(String.format(
-        //                     "%6.2f", data.get(Eeg.TP10.ordinal())));
-        //             }
-        //         });
-        //     }
-        // }
-
-        public void setFileWriter(MuseFileWriter fileWriter) {
-            this.fileWriter  = fileWriter;
         }
     }
 
@@ -405,21 +404,28 @@ public class MainActivity extends Activity implements OnClickListener {
         Button connectButton = (Button) findViewById(R.id.connect);
         connectButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 List<Muse> pairedMuses = MuseManager.getPairedMuses();
-                if(pairedMuses.size() < 1 || musesSpinner.getAdapter().getCount() < 1) {
-                    Log.w("Muse Handband", "There is noting to connect to");
+                if (pairedMuses.size() < 1 ||
+                        musesSpinner.getAdapter().getCount() < 1) {
+                    Log.w("Muse Headband", "There is nothing to connect to");
                 }
                 else {
                     muse = pairedMuses.get(musesSpinner.getSelectedItemPosition());
                     ConnectionState state = muse.getConnectionState();
-                    if(state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTED) {
-                        Log.w("Muse Headband", "Doesn't make sense to connect a second time to the same muse device");
+                    if (state == ConnectionState.CONNECTED ||
+                            state == ConnectionState.CONNECTING) {
+                        Log.w("Muse Headband", "doesn't make sense to connect second time to the same muse");
                         return;
                     }
-                    configure_Library();
-
-                    try{
+                    configure_library();
+                    /**
+                     * In most cases libmuse native library takes care about
+                     * exceptions and recovery mechanism, but native code still
+                     * may throw in some unexpected situations (like bad bluetooth
+                     * connection). Print all exceptions here.
+                     */
+                    try {
                         muse.runAsynchronously();
                     } catch (Exception e) {
                         Log.e("Muse Headband", e.toString());
@@ -477,7 +483,8 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         });
         landingBt = (Button) findViewById(R.id.landingBt);
-        landingBt.setOnClickListener(new View.OnClickListener(){
+        landingBt.setOnClickListener(new View.OnClickListener()
+        {
             public void onClick(View v)
             {
                 if(deviceController != null)
@@ -488,9 +495,9 @@ public class MainActivity extends Activity implements OnClickListener {
         });
 
         forwardBt = (Button) findViewById(R.id.forwardBt);
-        forwardBt.setOnClickListener(new View.OnClickListener(){
+        forwardBt.setOnTouchListener(new View.OnTouchListener(){
             @Override
-            public boolean onTouck(View v, MotionEvent event)
+            public boolean onTouch(View v, MotionEvent event)
             {
                 switch (event.getAction())
                 {
@@ -517,7 +524,7 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         });
 
-        backBt = (Button) findViewById(R.id.backbt);
+        backBt = (Button) findViewById(R.id.backBt);
         backBt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event)
@@ -761,7 +768,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 
 
-    private void configureLibrary() {
+    private void configure_library() {
         muse.registerConnectionListener(connectionListener);
         muse.registerDataListener(dataListener,
                                   MuseDataPacketType.ACCELEROMETER);
