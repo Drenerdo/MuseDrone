@@ -85,12 +85,11 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="libARDiscovery" level="project" />
     <orderEntry type="library" exported="" name="libARNetwork" level="project" />
+    <orderEntry type="library" exported="" name="libARDiscovery" level="project" />
     <orderEntry type="library" exported="" name="libARCommands" level="project" />
     <orderEntry type="library" exported="" name="libARNetworkAL" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
